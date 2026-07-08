@@ -70,6 +70,13 @@ commit:
 
 ## Change Log
 
+### v1.2.0 — 2026-07-08
+- New: app icon and web app manifest — "Add to Home Screen" on iOS (and
+  Android) now installs Tetrachrome as a standalone app with its own icon,
+  a mini four-colored Voronoi map in the game's palette
+- New: theme-color metas so the browser chrome matches the game in light
+  and dark mode
+
 ### v1.1.1 — 2026-07-08
 - Fix: Stats button (and any freshly added feature) could do nothing right
   after a release — GitHub Pages' ~10-minute asset cache could serve new

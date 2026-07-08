@@ -1,14 +1,18 @@
 // Offline support: pre-cache the app shell, then serve cache-first with a
 // background refresh so updates land on the next visit.
 // Bump the cache name on every release.
-const CACHE = 'tetrachrome-v1.1.1';
+const CACHE = 'tetrachrome-v1.2.0';
 const ASSETS = [
   './',
   './index.html',
-  './style.css?v=1.1.1',
-  './js/app.js?v=1.1.1',
-  './js/voronoi.js?v=1.1.1',
-  './js/solver.js?v=1.1.1',
+  './style.css?v=1.2.0',
+  './js/app.js?v=1.2.0',
+  './js/voronoi.js?v=1.2.0',
+  './js/solver.js?v=1.2.0',
+  './manifest.webmanifest?v=1.2.0',
+  './icons/icon-180.png?v=1.2.0',
+  './icons/icon-192.png?v=1.2.0',
+  './icons/icon-512.png?v=1.2.0',
 ];
 
 self.addEventListener('install', (e) => {
