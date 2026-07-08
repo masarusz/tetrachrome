@@ -249,36 +249,49 @@ main {
   margin: 0;
 }
 
+/* Docked at the bottom edge so the solved board stays visible. */
 .win {
   position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(3px);
-  border-radius: 16px;
+  inset: auto 0.9rem 0.9rem;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
 }
 
 .win[hidden] { display: none; }
 
 .win-card {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem 0.7rem;
   background: var(--panel);
-  border-radius: 20px;
-  padding: 2rem 3rem;
-  text-align: center;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  border-radius: 18px;
+  padding: 0.6rem 1.1rem;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+  animation: rise 0.25s ease;
 }
 
-.win-emoji { font-size: 2.5rem; }
+@keyframes rise {
+  from { transform: translateY(12px); opacity: 0; }
+}
 
-.win-card h2 { margin: 0.5rem 0 0.25rem; }
+.win-emoji { font-size: 1.35rem; }
 
-.win-card p { margin: 0 0 1.2rem; color: var(--muted); }
+.win-card h2 { margin: 0; font-size: 1.05rem; }
+
+.win-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  text-align: center;
+}
 
 .win-actions {
   display: flex;
-  gap: 0.6rem;
-  justify-content: center;
+  gap: 0.5rem;
 }
 
 /* ---------- level select overlay ---------- */
@@ -384,4 +397,10 @@ footer a { color: inherit; }
   .toolbar { justify-content: center; }
   .status { flex-basis: 100%; order: 3; }
   .swatch { width: 52px; height: 52px; }
+  .win { inset: auto 0.5rem 0.5rem; }
+  .win-card { padding: 0.45rem 0.8rem; gap: 0.25rem 0.5rem; }
+  .win-emoji { font-size: 1.1rem; }
+  .win-card h2 { font-size: 0.95rem; }
+  .win-card p { font-size: 0.75rem; }
+  .win-actions .action { padding: 0.35rem 0.8rem; font-size: 0.8rem; }
 }
