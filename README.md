@@ -62,3 +62,31 @@ branch → `main` / root).
 When releasing, bump the version in the footer of `index.html` and the
 `CACHE` name in `sw.js` (this is what makes clients pick up the new assets),
 then tag the commit.
+
+## Change Log
+
+### v1.1.0 — 2026-07-08
+- New: offline play — a service worker caches the app shell on first visit
+- New: Wordle-style share button for daily results (system share sheet on
+  mobile, clipboard on desktop)
+- New: stats screen — levels solved, perfect stars, dailies solved,
+  current/best daily streak, free play wins
+- UI: toasts now appear at the top of the board so they don't cover the
+  result bar
+
+### v1.0.1 — 2026-07-08
+- Fix: the solved board is now visible after winning — the full-screen
+  blurred overlay was replaced by a compact result bar docked at the bottom
+  edge of the board, sized down further on narrow screens
+- UI: version number shown in the footer
+
+### v1.0.0 — 2026-07-08
+- Initial release
+- 60-level campaign with deterministic seeded maps and par scoring
+  (⭐ for solving at par without hints)
+- Daily puzzle seeded from the UTC date
+- Free play with three map sizes
+- Solver-powered hints, including dead-end warnings
+- Undo, clear, and keyboard shortcuts
+- Color-blind pattern mode (Okabe–Ito palette plus texture overlays)
+- Dark mode, mobile-friendly, progress in `localStorage`
