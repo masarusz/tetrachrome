@@ -45,6 +45,9 @@ const newMapBtn = document.getElementById('new-map');
 const levelsEl = document.getElementById('levels');
 const levelGrid = document.getElementById('level-grid');
 const dailyBtn = document.getElementById('daily-btn');
+const winShare = document.getElementById('win-share');
+const statsEl = document.getElementById('stats');
+const statGrid = document.getElementById('stat-grid');
 const patternsBtn = document.getElementById('patterns-btn');
 const undoBtn = document.getElementById('undo');
 const toastEl = document.getElementById('toast');
@@ -59,15 +62,23 @@ let selected = 0; // -1 = eraser
 let moves = 0;
 let hintsUsed = 0;
 let undoStack = [];
+let lastResult = null; // details of the most recent win, for sharing
 
 // ---------- persistence ----------
 
 function loadProgress() {
-  const defaults = { current: 1, levels: {}, daily: {}, settings: { patterns: false } };
+  const defaults = {
+    current: 1, levels: {}, daily: {},
+    settings: { patterns: false }, stats: { freeSolved: 0 },
+  };
   try {
     const data = JSON.parse(localStorage.getItem(STORE_KEY));
     if (data && typeof data === 'object') {
-      return { ...defaults, ...data, settings: { ...defaults.settings, ...data.settings } };
+      return {
+        ...defaults, ...data,
+        settings: { ...defaults.settings, ...data.settings },
+        stats: { ...defaults.stats, ...data.stats },
+      };
     }
   } catch { /* corrupted storage: start fresh */ }
   return defaults;
@@ -191,8 +202,15 @@ function update() {
 function win() {
   const used = new Set(fills).size;
   const perfect = used <= par && hintsUsed === 0;
+  lastResult = {
+    key: dailyKey(), regions: fills.length, moves, used, par, perfect,
+    hints: hintsUsed, counts: PALETTE.map((_, c) => fills.filter((f) => f === c).length),
+  };
 
-  if (mode === 'campaign') {
+  if (mode === 'free') {
+    progress.stats.freeSolved++;
+    saveProgress();
+  } else if (mode === 'campaign') {
     const rec = progress.levels[level] ?? {};
     progress.levels[level] = {
       solved: true,
@@ -219,7 +237,94 @@ function win() {
     (hintsUsed ? ` · ${hintsUsed} hint${hintsUsed > 1 ? 's' : ''}` : '') +
     (mode === 'daily' ? '. New puzzle tomorrow!' : '');
   winNext.hidden = mode !== 'campaign' || level >= LEVEL_COUNT;
+  winShare.hidden = mode !== 'daily';
   winEl.hidden = false;
+}
+
+// ---------- share ----------
+
+async function shareDaily() {
+  if (!lastResult || mode !== 'daily') return;
+  const r = lastResult;
+  const squares = ['🟦', '🟧', '🟩', '🟪'];
+  const spread = r.counts
+    .map((n, i) => (n ? `${squares[i]}${n}` : ''))
+    .filter(Boolean)
+    .join(' ');
+  const text =
+    `Tetrachrome Daily ${r.key}\n` +
+    `${r.perfect ? '⭐' : '✅'} ${r.regions} regions · ${r.moves} moves · ` +
+    `${r.used}/${r.par} colors${r.hints ? ` · ${r.hints} hint${r.hints > 1 ? 's' : ''}` : ''}\n` +
+    `${spread}\n` +
+    'https://masarusz.github.io/tetrachrome/';
+  try {
+    if (navigator.share) {
+      await navigator.share({ text });
+    } else {
+      await navigator.clipboard.writeText(text);
+      showToast('Result copied to clipboard');
+    }
+  } catch { /* user dismissed the share sheet */ }
+}
+
+// ---------- stats ----------
+
+function computeStats() {
+  const lv = Object.values(progress.levels);
+  const days = Object.keys(progress.daily)
+    .filter((k) => progress.daily[k].solved)
+    .sort();
+  const DAY = 86400000;
+  const toUTC = (k) => Date.parse(`${k}T00:00:00Z`);
+  const fromUTC = (t) => new Date(t).toISOString().slice(0, 10);
+
+  let best = 0, run = 0, prev = null;
+  for (const k of days) {
+    const t = toUTC(k);
+    run = prev !== null && t - prev === DAY ? run + 1 : 1;
+    best = Math.max(best, run);
+    prev = t;
+  }
+  const set = new Set(days);
+  let cursor = toUTC(dailyKey());
+  if (!set.has(dailyKey())) cursor -= DAY; // streak survives until today is missed
+  let cur = 0;
+  while (set.has(fromUTC(cursor))) { cur++; cursor -= DAY; }
+
+  return {
+    levelsSolved: lv.filter((r) => r.solved).length,
+    stars: lv.filter((r) => r.perfect).length,
+    dailies: days.length,
+    perfectDailies: days.filter((k) => progress.daily[k].perfect).length,
+    curStreak: cur,
+    bestStreak: best,
+    freeSolved: progress.stats.freeSolved,
+  };
+}
+
+function openStats() {
+  const s = computeStats();
+  const tiles = [
+    [`${s.levelsSolved}/${LEVEL_COUNT}`, 'Levels solved'],
+    [s.stars, '⭐ Perfect levels'],
+    [s.dailies, 'Dailies solved'],
+    [s.perfectDailies, '⭐ Perfect dailies'],
+    [s.curStreak, 'Daily streak'],
+    [s.bestStreak, 'Best streak'],
+    [s.freeSolved, 'Free play wins'],
+  ];
+  statGrid.innerHTML = '';
+  for (const [num, label] of tiles) {
+    const d = document.createElement('div');
+    d.className = 'stat';
+    const b = document.createElement('b');
+    b.textContent = num;
+    const sp = document.createElement('span');
+    sp.textContent = label;
+    d.append(b, sp);
+    statGrid.appendChild(d);
+  }
+  statsEl.hidden = false;
 }
 
 function snapshot() {
@@ -386,6 +491,12 @@ document.querySelectorAll('.size-btn').forEach((b) => {
 });
 
 dailyBtn.addEventListener('click', startDaily);
+winShare.addEventListener('click', shareDaily);
+document.getElementById('stats-btn').addEventListener('click', openStats);
+document.getElementById('stats-close').addEventListener('click', () => { statsEl.hidden = true; });
+statsEl.addEventListener('click', (ev) => {
+  if (ev.target === statsEl) statsEl.hidden = true;
+});
 patternsBtn.addEventListener('click', togglePatterns);
 undoBtn.addEventListener('click', undo);
 document.getElementById('hint').addEventListener('click', hint);
@@ -400,7 +511,7 @@ document.getElementById('win-again').addEventListener('click', () => {
 winNext.addEventListener('click', () => startLevel(level + 1));
 
 document.addEventListener('keydown', (ev) => {
-  if (!levelsEl.hidden && ev.key === 'Escape') closeLevels();
+  if (ev.key === 'Escape') { closeLevels(); statsEl.hidden = true; }
   if (ev.key >= '1' && ev.key <= '4') select(+ev.key - 1);
   else if (ev.key === 'e' || ev.key === '0') select(-1);
   else if (ev.key === 'r') clearBoard();
@@ -422,3 +533,7 @@ window.__tetra = {
 buildPalette();
 refreshDailyBtn();
 startLevel(isUnlocked(progress.current) ? progress.current : 1);
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => { /* offline play unavailable */ });
+}

@@ -21,8 +21,14 @@ guarantees four colors are always enough.
   H hint, R clear.
 - **Color-blind mode** — pattern overlays (stripes, dots, lines, crosshatch)
   on top of an Okabe–Ito palette.
-- **Dark mode, mobile-friendly, offline-free** — progress is stored in
-  `localStorage`; there is no backend.
+- **Share your daily result** — Wordle-style share text (system share sheet
+  on mobile, clipboard on desktop).
+- **Stats screen** — levels solved, perfect stars, daily streaks, free play
+  wins.
+- **Offline play** — a service worker caches the app shell, so it works with
+  no connection after the first visit.
+- **Dark mode, mobile-friendly, no backend** — progress is stored in
+  `localStorage`.
 
 ## How it works
 
@@ -52,3 +58,7 @@ Then open <http://localhost:4173/>. There is nothing to install or build.
 
 Hosted on GitHub Pages from the `main` branch (Settings → Pages → Deploy from
 branch → `main` / root).
+
+When releasing, bump the version in the footer of `index.html` and the
+`CACHE` name in `sw.js` (this is what makes clients pick up the new assets),
+then tag the commit.

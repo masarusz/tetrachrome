@@ -174,7 +174,7 @@ main {
 .toast {
   position: absolute;
   left: 50%;
-  bottom: 1rem;
+  top: 1rem;
   transform: translateX(-50%);
   background: var(--ink);
   color: var(--bg);
@@ -379,6 +379,31 @@ main {
 }
 
 #daily-btn.done::after { content: ' ✓'; }
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.6rem;
+}
+
+.stat {
+  background: var(--panel);
+  border-radius: 14px;
+  padding: 0.9rem 0.6rem;
+  text-align: center;
+}
+
+.stat b {
+  display: block;
+  font-size: 1.6rem;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat span {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
 
 #patterns-btn.on {
   background: var(--accent);

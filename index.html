@@ -18,6 +18,7 @@
   <div class="toolbar">
     <button id="levels-btn" class="action secondary">▦ Levels</button>
     <button id="daily-btn" class="action secondary">☀ Daily</button>
+    <button id="stats-btn" class="action secondary" title="Statistics" aria-label="Statistics">📊</button>
     <span id="level-label" class="level-label"></span>
     <span id="status" class="status" aria-live="polite"></span>
     <button id="patterns-btn" class="action secondary" aria-pressed="false" title="Color-blind patterns">▨</button>
@@ -33,6 +34,7 @@
         <h2 id="win-title">Solved!</h2>
         <p id="win-stats"></p>
         <div class="win-actions">
+          <button id="win-share" class="action secondary" hidden>Share</button>
           <button id="win-again" class="action secondary">Replay</button>
           <button id="win-next" class="action">Next level</button>
         </div>
@@ -70,8 +72,18 @@
   </div>
 </div>
 
+<div id="stats" class="overlay" hidden>
+  <div class="overlay-card">
+    <div class="overlay-head">
+      <h2>Stats</h2>
+      <button id="stats-close" class="close-btn" aria-label="Close">✕</button>
+    </div>
+    <div id="stat-grid" class="stat-grid"></div>
+  </div>
+</div>
+
 <footer>
-  <a href="https://github.com/masarusz/tetrachrome">GitHub</a> · v1.0.1 · Based on the four color theorem
+  <a href="https://github.com/masarusz/tetrachrome">GitHub</a> · v1.1.0 · Based on the four color theorem
 </footer>
 
 <script type="module" src="js/app.js"></script>
