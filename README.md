@@ -59,11 +59,23 @@ Then open <http://localhost:4173/>. There is nothing to install or build.
 Hosted on GitHub Pages from the `main` branch (Settings → Pages → Deploy from
 branch → `main` / root).
 
-When releasing, bump the version in the footer of `index.html` and the
-`CACHE` name in `sw.js` (this is what makes clients pick up the new assets),
-then tag the commit.
+When releasing, bump the version **everywhere it appears**, then tag the
+commit:
+
+- the `?v=` query strings on `style.css` / `js/app.js` in `index.html` and on
+  the module imports at the top of `js/app.js` (GitHub Pages caches assets
+  for ~10 minutes, so unversioned URLs can pair new HTML with stale JS);
+- the `CACHE` name and the `ASSETS` query strings in `sw.js`;
+- the version shown in the `index.html` footer.
 
 ## Change Log
+
+### v1.1.1 — 2026-07-08
+- Fix: Stats button (and any freshly added feature) could do nothing right
+  after a release — GitHub Pages' ~10-minute asset cache could serve new
+  HTML with stale JS, and the service worker then pinned the stale file.
+  All assets are now referenced with `?v=` version query strings so each
+  release gets brand-new URLs.
 
 ### v1.1.0 — 2026-07-08
 - New: offline play — a service worker caches the app shell on first visit
