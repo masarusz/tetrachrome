@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tetrachrome</title>
+<meta name="description" content="A four-color map puzzle. Color every region so no neighbors match.">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎨</text></svg>'>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Tetrachrome</h1>
+  <p class="tagline">Color every region — neighbors must never match. Four colors always suffice.</p>
+</header>
+
+<main>
+  <div class="toolbar">
+    <button id="levels-btn" class="action secondary">▦ Levels</button>
+    <button id="daily-btn" class="action secondary">☀ Daily</button>
+    <span id="level-label" class="level-label"></span>
+    <span id="status" class="status" aria-live="polite"></span>
+    <button id="patterns-btn" class="action secondary" aria-pressed="false" title="Color-blind patterns">▨</button>
+    <button id="clear" class="action secondary">Clear</button>
+    <button id="new-map" class="action" hidden>New map</button>
+  </div>
+
+  <div class="board-wrap">
+    <svg id="board" viewBox="0 0 800 600" role="img" aria-label="Puzzle map"></svg>
+    <div id="win" class="win" hidden>
+      <div class="win-card">
+        <div class="win-emoji" id="win-emoji">🎉</div>
+        <h2 id="win-title">Solved!</h2>
+        <p id="win-stats"></p>
+        <div class="win-actions">
+          <button id="win-again" class="action secondary">Replay</button>
+          <button id="win-next" class="action">Next level</button>
+        </div>
+      </div>
+    </div>
+    <div id="toast" class="toast" hidden></div>
+  </div>
+
+  <div class="palette-row">
+    <div class="palette" id="palette" role="group" aria-label="Color palette"></div>
+    <div class="tools">
+      <button id="undo" class="swatch tool" aria-label="Undo" title="Undo (Z)">↶</button>
+      <button id="hint" class="swatch tool" aria-label="Hint" title="Hint (H)">💡</button>
+    </div>
+  </div>
+  <p class="hint">Pick a color, tap a region. Tap again with the same color to clear it. Keys: 1–4, E erase, Z undo, H hint, R clear.</p>
+</main>
+
+<div id="levels" class="overlay" hidden>
+  <div class="overlay-card">
+    <div class="overlay-head">
+      <h2>Levels</h2>
+      <button id="levels-close" class="close-btn" aria-label="Close">✕</button>
+    </div>
+    <div id="level-grid" class="level-grid"></div>
+    <div class="freeplay">
+      <h3>Free play</h3>
+      <p class="freeplay-note">Random maps, any size — no progress tracking.</p>
+      <div class="sizes" role="group" aria-label="Free play size">
+        <button class="size-btn" data-size="small">Small</button>
+        <button class="size-btn" data-size="medium">Medium</button>
+        <button class="size-btn" data-size="large">Large</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <a href="https://github.com/masarusz/tetrachrome">GitHub</a> · Based on the four color theorem
+</footer>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
