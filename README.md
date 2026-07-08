@@ -70,6 +70,12 @@ commit:
 
 ## Change Log
 
+### v1.2.1 — 2026-07-08
+- Fix: home-screen icon was not picked up on iOS — GitHub Pages silently
+  skipped the deploys of v1.1.1/v1.2.0 (re-triggered), and the
+  `apple-touch-icon` now uses a query-string-free URL with a `sizes`
+  attribute, since iOS can ignore icon URLs that carry query strings
+
 ### v1.2.0 — 2026-07-08
 - New: app icon and web app manifest — "Add to Home Screen" on iOS (and
   Android) now installs Tetrachrome as a standalone app with its own icon,

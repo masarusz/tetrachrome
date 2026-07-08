@@ -1,18 +1,20 @@
 // Offline support: pre-cache the app shell, then serve cache-first with a
 // background refresh so updates land on the next visit.
 // Bump the cache name on every release.
-const CACHE = 'tetrachrome-v1.2.0';
+const CACHE = 'tetrachrome-v1.2.1';
 const ASSETS = [
   './',
   './index.html',
-  './style.css?v=1.2.0',
-  './js/app.js?v=1.2.0',
-  './js/voronoi.js?v=1.2.0',
-  './js/solver.js?v=1.2.0',
-  './manifest.webmanifest?v=1.2.0',
-  './icons/icon-180.png?v=1.2.0',
-  './icons/icon-192.png?v=1.2.0',
-  './icons/icon-512.png?v=1.2.0',
+  './style.css?v=1.2.1',
+  './js/app.js?v=1.2.1',
+  './js/voronoi.js?v=1.2.1',
+  './js/solver.js?v=1.2.1',
+  './manifest.webmanifest?v=1.2.1',
+  // icons are content-immutable (rename on redesign), so no ?v= — iOS can
+  // ignore apple-touch-icon URLs that carry query strings
+  './icons/icon-180.png',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
 ];
 
 self.addEventListener('install', (e) => {
