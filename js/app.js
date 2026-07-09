@@ -1,8 +1,9 @@
-import { generateMap } from './voronoi.js?v=1.2.1';
-import { minColors, solveFrom } from './solver.js?v=1.2.1';
+import { generateMap } from './voronoi.js?v=1.3.0';
+import { minColors, solveFrom } from './solver.js?v=1.3.0';
 
 // Okabe–Ito colors: distinguishable under common color-vision deficiencies.
 const PALETTE = ['#0072B2', '#E69F00', '#009E73', '#CC79A7'];
+const COLOR_NAMES = ['blue', 'orange', 'green', 'pink'];
 const GLYPHS = ['╱', '●', '▬', '✚']; // shown on swatches in pattern mode
 const SIZES = { small: 10, medium: 18, large: 30 };
 const LEVEL_COUNT = 60;
@@ -63,6 +64,7 @@ let moves = 0;
 let hintsUsed = 0;
 let undoStack = [];
 let lastResult = null; // details of the most recent win, for sharing
+let activeDailyKey = null; // captured at startDaily so a game finished after UTC midnight is credited to the day it was started
 
 // ---------- persistence ----------
 
@@ -71,13 +73,18 @@ function loadProgress() {
     current: 1, levels: {}, daily: {},
     settings: { patterns: false }, stats: { freeSolved: 0 },
   };
+  // Field-level validation: valid JSON can still have the wrong shape
+  // (e.g. {"levels": null}) and would crash later property accesses.
+  const obj = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : {});
   try {
     const data = JSON.parse(localStorage.getItem(STORE_KEY));
     if (data && typeof data === 'object') {
       return {
-        ...defaults, ...data,
-        settings: { ...defaults.settings, ...data.settings },
-        stats: { ...defaults.stats, ...data.stats },
+        current: Number.isInteger(data.current) && data.current >= 1 ? data.current : 1,
+        levels: obj(data.levels),
+        daily: obj(data.daily),
+        settings: { ...defaults.settings, ...obj(data.settings) },
+        stats: { ...defaults.stats, ...obj(data.stats) },
       };
     }
   } catch { /* corrupted storage: start fresh */ }
@@ -86,7 +93,11 @@ function loadProgress() {
 
 const progress = loadProgress();
 
-const saveProgress = () => localStorage.setItem(STORE_KEY, JSON.stringify(progress));
+function saveProgress() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(progress));
+  } catch { /* quota exceeded or private mode: play on without persistence */ }
+}
 
 const isUnlocked = (k) => k === 1 || !!progress.levels[k - 1]?.solved;
 
@@ -122,7 +133,10 @@ function renderBoard() {
   board.innerHTML = defsMarkup();
   const cells = el('g', { id: 'cells' });
   map.cells.forEach((c, i) => {
-    cells.appendChild(el('path', { d: pathD(c.poly), class: 'region', 'data-i': i }));
+    cells.appendChild(el('path', {
+      d: pathD(c.poly), class: 'region', 'data-i': i,
+      tabindex: 0, role: 'button', 'aria-label': `Region ${i + 1} — uncolored`,
+    }));
   });
   board.appendChild(cells);
   board.appendChild(el('g', { id: 'conflicts' }));
@@ -162,11 +176,11 @@ function startFree(size) {
 
 function startDaily() {
   mode = 'daily';
-  const key = dailyKey();
+  activeDailyKey = dailyKey();
   newMapBtn.hidden = true;
-  const seed = dailySeed(key);
+  const seed = dailySeed(activeDailyKey);
   setupMap(seed, 18 + (seed % 15)); // 18–32 regions
-  levelLabel.textContent = `Daily ${key} · Par ${par}`;
+  levelLabel.textContent = `Daily ${activeDailyKey} · Par ${par}`;
 }
 
 // ---------- game loop ----------
@@ -176,9 +190,11 @@ const conflicts = () =>
 
 function update() {
   board.querySelectorAll('.region').forEach((p) => {
-    const c = fills[+p.dataset.i];
+    const i = +p.dataset.i;
+    const c = fills[i];
     p.classList.toggle('filled', c >= 0);
     p.style.fill = c >= 0 ? fillFor(c) : '';
+    p.setAttribute('aria-label', `Region ${i + 1} — ${c >= 0 ? COLOR_NAMES[c] : 'uncolored'}`);
   });
 
   const g = board.querySelector('#conflicts');
@@ -196,14 +212,18 @@ function update() {
 
   undoBtn.disabled = undoStack.length === 0;
 
-  if (done === fills.length && bad.length === 0) win();
+  // winEl.hidden guards re-entry: update() can run again on a finished
+  // board (e.g. toggling pattern mode), and a second win() would
+  // double-count the result.
+  if (done === fills.length && bad.length === 0 && winEl.hidden) win();
 }
 
 function win() {
   const used = new Set(fills).size;
   const perfect = used <= par && hintsUsed === 0;
   lastResult = {
-    key: dailyKey(), regions: fills.length, moves, used, par, perfect,
+    key: mode === 'daily' ? activeDailyKey : dailyKey(),
+    regions: fills.length, moves, used, par, perfect,
     hints: hintsUsed, counts: PALETTE.map((_, c) => fills.filter((f) => f === c).length),
   };
 
@@ -219,7 +239,7 @@ function win() {
     };
     saveProgress();
   } else if (mode === 'daily') {
-    const key = dailyKey();
+    const key = activeDailyKey; // day the puzzle was started, not finished
     const rec = progress.daily[key] ?? {};
     progress.daily[key] = {
       solved: true,
@@ -324,7 +344,7 @@ function openStats() {
     d.append(b, sp);
     statGrid.appendChild(d);
   }
-  statsEl.hidden = false;
+  openOverlay(statsEl, document.getElementById('stats-close'));
 }
 
 function snapshot() {
@@ -367,7 +387,12 @@ function hint() {
   for (const e of conflicts()) { conflicted.add(e.a); conflicted.add(e.b); }
   const preset = fills.map((c, i) => (conflicted.has(i) ? -1 : c));
   const sol = solveFrom(map.adjacency, 4, preset);
-  if (!sol) {
+  if (sol === undefined) {
+    // budget exhausted: unknown, so don't claim the position is dead
+    showToast('Too tangled to analyze — keep going or undo');
+    return;
+  }
+  if (sol === null) {
     showToast('No way to finish from here — undo or clear');
     return;
   }
@@ -464,17 +489,43 @@ function buildLevelGrid() {
   }
 }
 
+// Overlays: remember the opener and restore its focus on close.
+let overlayOpener = null;
+
+function openOverlay(overlay, focusTarget) {
+  overlayOpener = document.activeElement;
+  overlay.hidden = false;
+  focusTarget?.focus();
+}
+
+function closeOverlay(overlay) {
+  if (overlay.hidden) return;
+  overlay.hidden = true;
+  if (overlayOpener?.isConnected) overlayOpener.focus();
+  overlayOpener = null;
+}
+
 const openLevels = () => {
   buildLevelGrid();
-  levelsEl.hidden = false;
+  openOverlay(levelsEl, document.getElementById('levels-close'));
 };
-const closeLevels = () => { levelsEl.hidden = true; };
+const closeLevels = () => closeOverlay(levelsEl);
+const anyOverlayOpen = () => !levelsEl.hidden || !statsEl.hidden;
 
 // ---------- events ----------
 
 board.addEventListener('click', (ev) => {
   const t = ev.target.closest('.region');
   if (t) paint(+t.dataset.i);
+});
+
+board.addEventListener('keydown', (ev) => {
+  if (ev.key !== 'Enter' && ev.key !== ' ') return;
+  const t = ev.target.closest('.region');
+  if (t) {
+    ev.preventDefault();
+    paint(+t.dataset.i);
+  }
 });
 
 document.getElementById('levels-btn').addEventListener('click', openLevels);
@@ -493,9 +544,9 @@ document.querySelectorAll('.size-btn').forEach((b) => {
 dailyBtn.addEventListener('click', startDaily);
 winShare.addEventListener('click', shareDaily);
 document.getElementById('stats-btn').addEventListener('click', openStats);
-document.getElementById('stats-close').addEventListener('click', () => { statsEl.hidden = true; });
+document.getElementById('stats-close').addEventListener('click', () => closeOverlay(statsEl));
 statsEl.addEventListener('click', (ev) => {
-  if (ev.target === statsEl) statsEl.hidden = true;
+  if (ev.target === statsEl) closeOverlay(statsEl);
 });
 patternsBtn.addEventListener('click', togglePatterns);
 undoBtn.addEventListener('click', undo);
@@ -511,7 +562,12 @@ document.getElementById('win-again').addEventListener('click', () => {
 winNext.addEventListener('click', () => startLevel(level + 1));
 
 document.addEventListener('keydown', (ev) => {
-  if (ev.key === 'Escape') { closeLevels(); statsEl.hidden = true; }
+  if (ev.key === 'Escape') {
+    closeOverlay(levelsEl);
+    closeOverlay(statsEl);
+    return;
+  }
+  if (anyOverlayOpen()) return; // game shortcuts must not mutate a hidden board
   if (ev.key >= '1' && ev.key <= '4') select(+ev.key - 1);
   else if (ev.key === 'e' || ev.key === '0') select(-1);
   else if (ev.key === 'r') clearBoard();
@@ -520,9 +576,10 @@ document.addEventListener('keydown', (ev) => {
 });
 
 // Debug hook for automated verification; not part of the game API.
+// Arrays are copied so external code can't mutate live game state.
 window.__tetra = {
   get map() { return map; },
-  get fills() { return fills; },
+  get fills() { return [...fills]; },
   get par() { return par; },
   get level() { return level; },
   get mode() { return mode; },

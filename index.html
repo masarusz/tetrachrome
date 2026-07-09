@@ -7,11 +7,11 @@
 <meta name="description" content="A four-color map puzzle. Color every region so no neighbors match.">
 <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎨</text></svg>'>
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<link rel="manifest" href="manifest.webmanifest?v=1.2.1">
+<link rel="manifest" href="manifest.webmanifest?v=1.3.0">
 <meta name="apple-mobile-web-app-title" content="Tetrachrome">
 <meta name="theme-color" content="#f5f3ee">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#141416">
-<link rel="stylesheet" href="style.css?v=1.2.1">
+<link rel="stylesheet" href="style.css?v=1.3.0">
 </head>
 <body>
 <header>
@@ -58,10 +58,10 @@
   <p class="hint">Pick a color, tap a region. Tap again with the same color to clear it. Keys: 1–4, E erase, Z undo, H hint, R clear.</p>
 </main>
 
-<div id="levels" class="overlay" hidden>
+<div id="levels" class="overlay" role="dialog" aria-modal="true" aria-labelledby="levels-title" hidden>
   <div class="overlay-card">
     <div class="overlay-head">
-      <h2>Levels</h2>
+      <h2 id="levels-title">Levels</h2>
       <button id="levels-close" class="close-btn" aria-label="Close">✕</button>
     </div>
     <div id="level-grid" class="level-grid"></div>
@@ -77,10 +77,10 @@
   </div>
 </div>
 
-<div id="stats" class="overlay" hidden>
+<div id="stats" class="overlay" role="dialog" aria-modal="true" aria-labelledby="stats-title" hidden>
   <div class="overlay-card">
     <div class="overlay-head">
-      <h2>Stats</h2>
+      <h2 id="stats-title">Stats</h2>
       <button id="stats-close" class="close-btn" aria-label="Close">✕</button>
     </div>
     <div id="stat-grid" class="stat-grid"></div>
@@ -88,9 +88,9 @@
 </div>
 
 <footer>
-  <a href="https://github.com/masarusz/tetrachrome">GitHub</a> · v1.2.1 · Based on the four color theorem
+  <a href="https://github.com/masarusz/tetrachrome">GitHub</a> · v1.3.0 · Based on the four color theorem
 </footer>
 
-<script type="module" src="js/app.js?v=1.2.1"></script>
+<script type="module" src="js/app.js?v=1.3.0"></script>
 </body>
 </html>

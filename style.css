@@ -86,11 +86,6 @@ main {
   cursor: pointer;
 }
 
-.size-btn.selected {
-  background: var(--accent);
-  color: #fff;
-}
-
 .status {
   flex: 1;
   text-align: center;
@@ -148,6 +143,12 @@ main {
 .region:not(.filled):hover { fill: var(--cell-hover); }
 
 .region.filled:hover { filter: brightness(1.12); }
+
+.region:focus-visible {
+  outline: none;
+  stroke: var(--ink);
+  stroke-width: 5;
+}
 
 .conflict {
   stroke: var(--danger);
@@ -417,6 +418,12 @@ footer {
 }
 
 footer a { color: inherit; }
+
+@media (prefers-reduced-motion: reduce) {
+  .conflict, .region.hinted, .win-card { animation: none; }
+  .region, .swatch, .level-btn, .size-btn { transition: none; }
+  .swatch:hover, .level-btn:hover:not(:disabled) { transform: none; }
+}
 
 @media (max-width: 520px) {
   .toolbar { justify-content: center; }

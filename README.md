@@ -54,6 +54,15 @@ python3 -m http.server 4173
 
 Then open <http://localhost:4173/>. There is nothing to install or build.
 
+Run the tests (map generation and solver regression suite) with:
+
+```sh
+node tests/test.mjs
+```
+
+`icons/icon-1024.png` is the master icon; regenerate the smaller sizes from
+it with `sips -z <size> <size> icons/icon-1024.png --out icons/icon-<size>.png`.
+
 ## Deployment
 
 Hosted on GitHub Pages from the `main` branch (Settings → Pages → Deploy from
@@ -69,6 +78,27 @@ commit:
 - the version shown in the `index.html` footer.
 
 ## Change Log
+
+### v1.3.0 — 2026-07-09
+- Fix: the service worker no longer deletes caches belonging to other apps
+  on the same origin (only `tetrachrome-*` caches are cleaned up)
+- Fix: a finished board could be re-recorded as a win (e.g. toggling
+  pattern mode), inflating free-play stats
+- Fix: a daily puzzle started before UTC midnight and finished after is now
+  credited to the day it was started
+- Fix: game keyboard shortcuts (R/Z/H/1–4) no longer mutate the board while
+  the Levels or Stats overlay is open
+- Fix: the hint no longer claims a position is impossible when the solver
+  merely ran out of search budget
+- Fix: storage failures (private mode, quota) and malformed saved progress
+  no longer crash the game
+- Accessibility: regions are keyboard-focusable (Tab + Enter/Space to
+  paint) with color announcements; overlays are proper dialogs with focus
+  management; animations respect `prefers-reduced-motion`
+- Service worker: background refresh completes reliably (`waitUntil`) and
+  runtime caching is limited to the app shell
+- Internal: unified the duplicated solver search paths; added a regression
+  test suite (`node tests/test.mjs`)
 
 ### v1.2.1 — 2026-07-08
 - Fix: home-screen icon was not picked up on iOS — GitHub Pages silently
