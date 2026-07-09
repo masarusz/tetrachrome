@@ -2,15 +2,15 @@
 // background refresh so updates land on the next visit.
 // Bump the cache name on every release.
 const PREFIX = 'tetrachrome-';
-const CACHE = `${PREFIX}v1.3.0`;
+const CACHE = `${PREFIX}v1.3.1`;
 const ASSETS = [
   './',
   './index.html',
-  './style.css?v=1.3.0',
-  './js/app.js?v=1.3.0',
-  './js/voronoi.js?v=1.3.0',
-  './js/solver.js?v=1.3.0',
-  './manifest.webmanifest?v=1.3.0',
+  './style.css?v=1.3.1',
+  './js/app.js?v=1.3.1',
+  './js/voronoi.js?v=1.3.1',
+  './js/solver.js?v=1.3.1',
+  './manifest.webmanifest?v=1.3.1',
   // icons are content-immutable (rename on redesign), so no ?v= — iOS can
   // ignore apple-touch-icon URLs that carry query strings
   './icons/icon-180.png',

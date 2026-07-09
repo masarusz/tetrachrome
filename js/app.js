@@ -1,5 +1,5 @@
-import { generateMap } from './voronoi.js?v=1.3.0';
-import { minColors, solveFrom } from './solver.js?v=1.3.0';
+import { generateMap } from './voronoi.js?v=1.3.1';
+import { minColors, solveFrom } from './solver.js?v=1.3.1';
 
 // Okabe–Ito colors: distinguishable under common color-vision deficiencies.
 const PALETTE = ['#0072B2', '#E69F00', '#009E73', '#CC79A7'];

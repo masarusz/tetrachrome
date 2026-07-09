@@ -79,6 +79,13 @@ commit:
 
 ## Change Log
 
+### v1.3.1 — 2026-07-09
+- Fix: clicking a region no longer draws a stray blue line — v1.3.0 made
+  regions focusable for keyboard play, and desktop browsers rendered their
+  native focus ring along the clicked path's bounding box; the ring is now
+  suppressed for mouse focus and shown only for keyboard focus
+  (`:focus-visible`)
+
 ### v1.3.0 — 2026-07-09
 - Fix: the service worker no longer deletes caches belonging to other apps
   on the same origin (only `tetrachrome-*` caches are cleaned up)

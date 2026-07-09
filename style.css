@@ -144,8 +144,13 @@ main {
 
 .region.filled:hover { filter: brightness(1.12); }
 
-.region:focus-visible {
+/* Mouse clicks focus regions too (tabindex): hide the native ring there,
+   and show our indicator only for keyboard focus. */
+.region:focus {
   outline: none;
+}
+
+.region:focus-visible {
   stroke: var(--ink);
   stroke-width: 5;
 }
