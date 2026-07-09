@@ -79,6 +79,10 @@ commit:
 
 ## Change Log
 
+### v1.3.2 — 2026-07-09
+- UI: the keyboard-shortcut hint (Keys: 1–4, E erase, …) is hidden on touch
+  devices, where there is no keyboard to use it with
+
 ### v1.3.1 — 2026-07-09
 - Fix: clicking a region no longer draws a stray blue line — v1.3.0 made
   regions focusable for keyboard play, and desktop browsers rendered their

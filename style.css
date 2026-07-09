@@ -255,6 +255,11 @@ main {
   margin: 0;
 }
 
+/* Touch devices have no keyboard: the shortcut list is just noise there. */
+@media (hover: none) and (pointer: coarse) {
+  .keys-hint { display: none; }
+}
+
 /* Docked at the bottom edge so the solved board stays visible. */
 .win {
   position: absolute;

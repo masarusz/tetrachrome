@@ -7,11 +7,11 @@
 <meta name="description" content="A four-color map puzzle. Color every region so no neighbors match.">
 <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎨</text></svg>'>
 <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-<link rel="manifest" href="manifest.webmanifest?v=1.3.1">
+<link rel="manifest" href="manifest.webmanifest?v=1.3.2">
 <meta name="apple-mobile-web-app-title" content="Tetrachrome">
 <meta name="theme-color" content="#f5f3ee">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#141416">
-<link rel="stylesheet" href="style.css?v=1.3.1">
+<link rel="stylesheet" href="style.css?v=1.3.2">
 </head>
 <body>
 <header>
@@ -55,7 +55,7 @@
       <button id="hint" class="swatch tool" aria-label="Hint" title="Hint (H)">💡</button>
     </div>
   </div>
-  <p class="hint">Pick a color, tap a region. Tap again with the same color to clear it. Keys: 1–4, E erase, Z undo, H hint, R clear.</p>
+  <p class="hint">Pick a color, tap a region. Tap again with the same color to clear it. <span class="keys-hint">Keys: 1–4, E erase, Z undo, H hint, R clear.</span></p>
 </main>
 
 <div id="levels" class="overlay" role="dialog" aria-modal="true" aria-labelledby="levels-title" hidden>
@@ -88,9 +88,9 @@
 </div>
 
 <footer>
-  <a href="https://github.com/masarusz/tetrachrome">GitHub</a> · v1.3.1 · Based on the four color theorem
+  <a href="https://github.com/masarusz/tetrachrome">GitHub</a> · v1.3.2 · Based on the four color theorem
 </footer>
 
-<script type="module" src="js/app.js?v=1.3.1"></script>
+<script type="module" src="js/app.js?v=1.3.2"></script>
 </body>
 </html>
